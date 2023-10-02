@@ -1,17 +1,33 @@
 import * as cdk from 'aws-cdk-lib';
 import { Template, Match } from 'aws-cdk-lib/assertions';
-import * as Pipelines from '../lib/pipelines-stack';
+import * as Pipelines from '../lib/pipelines-demo-pipeline-stack'
 
-test('SQS Queue and SNS Topic Created', () => {
-  const app = new cdk.App();
-  // WHEN
-  const stack = new Pipelines.PipelinesStack(app, 'MyTestStack');
-  // THEN
+describe('CDK Synt tests', () => {
 
-  const template = Template.fromStack(stack);
+  test('CodePipeline Stack Tests', () => {
+    const app = new cdk.App();
+    // WHEN
+    const stack = new Pipelines.CdkpipelinesDemoPipelineStack(app, 'MyTestStack');
+    // THEN
 
-  template.hasResourceProperties('AWS::SQS::Queue', {
-    VisibilityTimeout: 300
+    const template = Template.fromStack(stack);
+
+    template.hasResourceProperties('AWS::CodePipeline::Pipeline', {
+      Name: 'DemoCdkServicePipeline'
+    });
+
+    template.hasResourceProperties('AWS::CodePipeline::Pipeline', Match.objectLike({
+      Stages: Match.arrayWith([
+        Match.objectLike({
+          Name: 'Source',
+          Actions: Match.arrayWith([Match.objectLike({
+            ActionTypeId: Match.objectLike({
+              Owner: 'ThirdParty',
+              Provider: 'GitHub'
+            })
+          })])
+        })
+      ])
+    }));
   });
-  template.resourceCountIs('AWS::SNS::Topic', 1);
 });

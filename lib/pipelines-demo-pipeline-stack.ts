@@ -12,7 +12,7 @@ export class CdkpipelinesDemoPipelineStack extends Stack {
 
         const pipeline = new CodePipeline(this, 'Pipeline', {
             // The pipeline name
-            pipelineName: 'MyServicePipeline',
+            pipelineName: 'DemoCdkServicePipeline',
 
             // How it will be built and synthesized
             synth: new ShellStep('Synth', {
